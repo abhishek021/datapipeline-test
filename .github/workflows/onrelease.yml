@@ -8,7 +8,6 @@ jobs:
   prepare-tag:
     outputs:
         tag: ${{ steps.fetch_tag.outputs.tag }}
-    environment: production
     runs-on: ubuntu-latest
     steps:
       - name: Get tag from latest release
