@@ -1,0 +1,40 @@
+name: Deploy to production
+on:
+  workflow_run:
+    workflows: [Create Release]
+    types:
+      - completed
+jobs:
+  prepare-tag:
+    outputs:
+        tag: ${{ steps.fetch_tag.outputs.tag }}
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get tag from latest release
+        id: fetch_tag
+        run: |
+            REPO=${{ github.event.repository.full_name }}
+            TOKEN=${{ github.token }}
+
+            API_URL="https://api.github.com/repos/$REPO/releases/latest"
+
+            # Download the release artifact details
+            tag_name=$(curl -s -H "Authorization: token ${TOKEN}" "${API_URL}"|jq -r '.tag_name')
+
+            echo "Tag: ${tag_name}"
+            echo "tag=$tag_name"  >> "$GITHUB_OUTPUT"
+                
+  Deploy-Release:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: prepare-tag
+    steps: 
+     - name: Download the Release    
+       uses: actions/checkout@v3
+       with:
+        ref: ${{ needs.prepare-tag.outputs.tag }}
+        token: ${{ github.token }}
+     - name: Check 
+       run: ls -lrt  
+     
