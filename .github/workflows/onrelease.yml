@@ -9,11 +9,13 @@ jobs:
     outputs:
         tag: ${{ steps.fetch_tag.outputs.tag }}
     runs-on: ubuntu-latest
-    if: github.event.release.tag_name == github.event.repository.latest_release.tag_name
+#     if: github.event.release.tag_name == github.event.repository.latest_release.tag_name
     steps:
       - name: Get tag from latest release
         id: fetch_tag
         run: |
+            echo ${{ github.event.release.tag_name }}
+            echo ${{ github.event.repository.latest_release.tag_name }}
             REPO=${{ github.event.repository.full_name }}
             TOKEN=${{ github.token }}
 
